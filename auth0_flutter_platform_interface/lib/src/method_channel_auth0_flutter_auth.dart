@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'account.dart';
 import 'auth/auth_login_options.dart';
 import 'auth/auth_renew_access_token_result.dart';
 import 'auth/auth_reset_password_options.dart';
@@ -45,22 +46,16 @@ class MethodChannelAuth0FlutterAuth extends Auth0FlutterAuthPlatform {
   }
 
   @override
-  Future<AuthRenewAccessTokenResult?> renewAccessToken(
-      final String refreshToken) async {
+  Future<AuthRenewAccessTokenResult> renewAccessToken(
+      final String refreshToken, final Account account) async {
     final Map<dynamic, dynamic>? result =
-        await _channel.invokeMethod(authRenewAccessTokenMethod);
+        await _channel.invokeMethod(authRenewAccessTokenMethod, {'refreshToken': refreshToken, 'domain': account.domain, 'clientId': account.clientId});
 
     if (result == null) {
-      return null;
+      return throw Exception('Auth channel returned null');
     }
 
-    return AuthRenewAccessTokenResult(
-      idToken: result['idToken'] as String,
-      accessToken: result['accessToken'] as String,
-      refreshToken: result['refreshToken'] as String?,
-      expiresAt: DateTime.parse(result['expiresAt'] as String),
-      scopes: Set.from(result['scopes'] as List<Object?>),
-    );
+    return AuthRenewAccessTokenResult.fromMap(result);
   }
 
   @override

@@ -32,9 +32,8 @@ class AuthenticationApi {
           final Map<String, Object> userMetadata = const {}}) =>
       Future.value();
 
-  Future<Credentials> renewAccessToken({required final String refreshToken}) =>
-      Future.value(
-          Credentials(idToken: '', accessToken: '', expiresAt: DateTime.now()));
+  Future<AuthRenewAccessTokenResult> renewAccessToken({required final String refreshToken}) =>
+      Auth0FlutterAuthPlatform.instance.renewAccessToken(refreshToken, account);
 
   Future<void> resetPassword(
           {required final String email, required final String password}) =>

@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'account.dart';
 import 'auth/auth_login_options.dart';
 import 'auth/auth_renew_access_token_result.dart';
 import 'auth/auth_reset_password_options.dart';
@@ -34,8 +35,8 @@ abstract class Auth0FlutterAuthPlatform extends PlatformInterface {
     throw UnimplementedError('authSignUp() has not been implemented');
   }
 
-  Future<AuthRenewAccessTokenResult?> renewAccessToken(
-      final String refreshToken) {
+  Future<AuthRenewAccessTokenResult> renewAccessToken(
+      final String refreshToken, final Account account) {
     throw UnimplementedError('authRenewAccessToken() has not been implemented');
   }
 

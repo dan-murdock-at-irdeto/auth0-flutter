@@ -14,7 +14,7 @@ const String logoutMethod = 'webAuth#logout';
 class MethodChannelAuth0FlutterWebAuth extends Auth0FlutterWebAuthPlatform {
   @override
   Future<LoginResult> login(final WebAuthLoginInput input) async {
-    final Map<String, dynamic>? result;
+    final Map<dynamic, dynamic>? result;
     try {
       result = await _channel.invokeMapMethod(loginMethod, input.toMap());
     } on PlatformException catch (e) {
