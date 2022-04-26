@@ -34,10 +34,10 @@ class ApiCardState extends State<ApiCard> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   TextFormField(
-                    controller: usernameOrEmailController,
                     decoration: const InputDecoration(
                       hintText: 'Username or email',
                     ),
+                    onChanged: (final input) => usernameOrEmail = input,
                     validator: (final String? value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter an username or email';
@@ -46,13 +46,13 @@ class ApiCardState extends State<ApiCard> {
                     },
                   ),
                   TextFormField(
-                    controller: passwordController,
                     decoration: const InputDecoration(
                       hintText: 'Password',
                     ),
                     obscureText: true,
                     enableSuggestions: false,
                     autocorrect: false,
+                    onChanged: (final input) => password = input,
                     validator: (final String? value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a password';
