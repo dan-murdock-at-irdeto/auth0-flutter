@@ -125,12 +125,10 @@ jobs:
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
           # taken to be the root directory of the workspace.
-          root: ./auth0_flutter
+          root: ./
           # Must be relative path from root
           paths:
-            - build
-            - example/.env
-            - example/android/app/src/main/res/values/strings.xml
+            - ./auth0_flutter
   test_android:
     executor:
       name: android/android-machine
@@ -140,10 +138,11 @@ jobs:
       - checkout
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: ./auth0_flutter
+          at: ./
       - flutter/install_sdk_and_pub:
           app-dir: ./auth0_flutter
           flutter_version: << pipeline.parameters.flutter_version >>
+      - local-android/prepare-config
       - run:
           name: Run Android Unit tests
           command: gradle clean jacocoTestReportDebug
@@ -184,6 +183,7 @@ jobs:
       - flutter/install_sdk_and_pub:
           app-dir: ./auth0_flutter
           flutter_version: << pipeline.parameters.flutter_version >>
+      - local-android/prepare-config
       - local-android/run-smoke-tests:
           android_simulator: << parameters.android_simulator >>
       - android/save-gradle-cache:
@@ -240,8 +240,12 @@ workflows:
   build_and_test:
     jobs:
       - analyze_dart
-      - test_flutter
-      - build_android
+      - test_flutter:
+          requires:
+            - analyze_dart
+      - build_android:
+          requires:
+            - analyze_dart
       - test_android:
           requires:
             - build_android
@@ -251,3 +255,5 @@ workflows:
             - build_android
       - test_ios:
           ios_simulator: iPhone 13
+          requires:
+            - analyze_dart
