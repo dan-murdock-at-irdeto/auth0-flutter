@@ -128,7 +128,7 @@ jobs:
           root: ./
           # Must be relative path from root
           paths:
-            - ./auth0_flutter
+            - ./auth0_flutter/**/*
   test_android:
     executor:
       name: android/android-machine
