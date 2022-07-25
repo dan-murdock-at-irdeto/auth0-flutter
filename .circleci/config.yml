@@ -55,7 +55,7 @@ parameters:
     type: string
     default: 3.0.5
 jobs:
-  test_flutter_package:
+  analyze_dart:
     docker:
       - image: cimg/base:current
     steps:
@@ -65,14 +65,7 @@ jobs:
           flutter_version: << pipeline.parameters.flutter_version >>
       - run:
           name: Analyze App Facing Package
-          command: |
-            cp example/.env.example example/.env
-            dart analyze
-          working_directory: ./auth0_flutter
-      - run:
-          name: Run package unit tests
-          command: |
-            flutter test --coverage
+          command: dart analyze
           working_directory: ./auth0_flutter
       - flutter/install_pub:
           app-dir: ./auth0_flutter_platform_interface
@@ -80,6 +73,21 @@ jobs:
           name: Analyze Platform Interface Package
           command: dart analyze
           working_directory: ./auth0_flutter_platform_interface
+  test_flutter:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - flutter/install_sdk_and_pub:
+          app-dir: ./auth0_flutter
+          flutter_version: << pipeline.parameters.flutter_version >>
+      - run:
+          name: Run package unit tests
+          command: |
+            flutter test --coverage
+          working_directory: ./auth0_flutter
+      - flutter/install_pub:
+          app-dir: ./auth0_flutter_platform_interface
       - run:
           name: Run platform interface unit tests
           command: |
@@ -93,7 +101,7 @@ jobs:
           file: ./auth0_flutter_platform_interface/coverage/lcov.info
           upload_name: Auth0 Flutter Platform Interface
           flags: auth0_flutter_platform_interface
-  test_android:
+  build_android:
     executor:
       name: android/android-machine
       resource-class: medium
@@ -110,12 +118,34 @@ jobs:
           name: Build Android Example App
           command: flutter build apk
           working_directory: ./auth0_flutter/example
+      - android/save-gradle-cache
+      - android/save-build-cache
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+          # taken to be the root directory of the workspace.
+          root: ./auth0_flutter
+          # Must be relative path from root
+          paths:
+            - build
+            - example/.env
+            - example/android/app/src/main/res/values/strings.xml
+  test_android:
+    executor:
+      name: android/android-machine
+      resource-class: medium
+      tag: 2022.06.1
+    steps:
+      - checkout
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: ./auth0_flutter
+      - flutter/install_sdk_and_pub:
+          app-dir: ./auth0_flutter
+          flutter_version: << pipeline.parameters.flutter_version >>
       - run:
           name: Run Android Unit tests
           command: gradle clean jacocoTestReportDebug
           working_directory: ./auth0_flutter/example/android
-      - android/save-gradle-cache
-      - android/save-build-cache
       - run:
           name: Save test results
           when: always
@@ -146,14 +176,12 @@ jobs:
                 circleci-agent step halt
             fi
       - checkout
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: ./auth0_flutter
       - flutter/install_sdk_and_pub:
           app-dir: ./auth0_flutter
           flutter_version: << pipeline.parameters.flutter_version >>
-      - local-android/prepare-config
-      - run:
-          name: Build Android app
-          command: flutter build apk
-          working_directory: ./auth0_flutter/example
       - local-android/run-smoke-tests:
           android_simulator: << parameters.android_simulator >>
       - android/save-gradle-cache:
@@ -209,15 +237,15 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - test_flutter_package
+      - analyze_dart
+      - test_flutter
+      - build_android
       - test_android:
           requires:
-            - test_flutter_package
+            - build_android
       - smoke_test_android:
           android_simulator: system-images;android-29;google_apis;x86
           requires:
-            - test_flutter_package
+            - build_android
       - test_ios:
           ios_simulator: iPhone 13
-          requires:
-            - test_flutter_package
