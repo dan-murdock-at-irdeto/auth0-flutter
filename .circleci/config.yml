@@ -24,6 +24,22 @@ orbs:
 
                 mv android/local.properties.ci android/local.properties
               working_directory: ./auth0_flutter/example
+      prepare-config2:
+        description: Prepares the environment configuration files
+        steps:
+          - run:
+              name: Prepare Environment Configuration
+              command: |
+                cp .env.example .env
+                sed -i "s/{DOMAIN}/$AUTH0_DOMAIN/" .env
+                sed -i "s/{CLIENT_ID}/$AUTH0_CLIENT_ID/" .env
+                sed -i "s/# AUTH0_CUSTOM_SCHEME=/AUTH0_CUSTOM_SCHEME=demo/" .env
+
+                mv android/app/src/main/res/values/strings.xml.example android/app/src/main/res/values/strings.xml
+                sed -i "s/{DOMAIN}/$AUTH0_DOMAIN/" android/app/src/main/res/values/strings.xml
+
+                mv android/local.properties.ci android/local.properties
+              working_directory: ./sample
       run-smoke-tests:
         description: Runs the Android smoke tests
         parameters:
@@ -50,6 +66,32 @@ orbs:
           - android/run-tests:
               max-tries: 1
               working-directory: ./auth0_flutter/example/android
+      run-smoke-tests2:
+        description: Runs the Android smoke tests
+        parameters:
+          android_simulator:
+            type: string
+        steps:
+          - android/accept-licenses
+          - android/create-avd:
+              avd-name: auth0_sample_avd
+              system-image: << parameters.android_simulator >>
+              install: true
+          - android/start-emulator:
+              avd-name: auth0_sample_avd
+              no-window: true
+              restore-gradle-cache-prefix: v1a
+              post-emulator-launch-assemble-command: ""
+              post-emulator-wait-steps:
+                - run:
+                    name: Disable Chrome welcome prompt
+                    command: adb shell 'echo "chrome --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line'
+                - run:
+                    name: Enable ADB root
+                    command: adb root
+          - android/run-tests:
+              max-tries: 1
+              working-directory: ./sample/android
 parameters:
   flutter_version:
     type: string
@@ -155,6 +197,34 @@ jobs:
           command: flutter build apk
           working_directory: ./auth0_flutter/example
       - local-android/run-smoke-tests:
+          android_simulator: << parameters.android_simulator >>
+      - android/save-gradle-cache:
+          cache-prefix: v1a
+  smoke_test_android2:
+    parameters:
+        android_simulator:
+          type: string
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2022.06.1
+    steps:
+      - run:
+          name: Guard Smoke Tests
+          command: |
+            if ! [[ -z "$CIRCLE_PR_NUMBER" ]]; then
+                circleci-agent step halt
+            fi
+      - checkout
+      - flutter/install_sdk_and_pub:
+          app-dir: ./sample
+          flutter_version: << pipeline.parameters.flutter_version >>
+      - local-android/prepare-config2
+      - run:
+          name: Build Android app
+          command: flutter build apk
+          working_directory: ./sample
+      - local-android/run-smoke-tests2:
           android_simulator: << parameters.android_simulator >>
       - android/save-gradle-cache:
           cache-prefix: v1a
