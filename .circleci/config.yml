@@ -54,7 +54,6 @@ orbs:
           - android/start-emulator:
               avd-name: auth0_sample_avd
               no-window: true
-              restore-gradle-cache-prefix: v1a
               post-emulator-launch-assemble-command: ""
               post-emulator-wait-steps:
                 - run:
@@ -80,7 +79,6 @@ orbs:
           - android/start-emulator:
               avd-name: auth0_sample_avd
               no-window: true
-              restore-gradle-cache-prefix: v1a2
               post-emulator-launch-assemble-command: ""
               post-emulator-wait-steps:
                 - run:
@@ -145,8 +143,6 @@ jobs:
       - flutter/install_sdk_and_pub:
           app-dir: ./auth0_flutter
           flutter_version: << pipeline.parameters.flutter_version >>
-      - android/restore-gradle-cache
-      - android/restore-build-cache
       - local-android/prepare-config
       - run:
           name: Build Android Example App
@@ -156,8 +152,6 @@ jobs:
           name: Run Android Unit tests
           command: gradle clean jacocoTestReportDebug
           working_directory: ./auth0_flutter/example/android
-      - android/save-gradle-cache
-      - android/save-build-cache
       - run:
           name: Save test results
           when: always
@@ -198,8 +192,6 @@ jobs:
           working_directory: ./auth0_flutter/example
       - local-android/run-smoke-tests:
           android_simulator: << parameters.android_simulator >>
-      - android/save-gradle-cache:
-          cache-prefix: v1a
   smoke_test_android2:
     parameters:
         android_simulator:
@@ -226,8 +218,6 @@ jobs:
           working_directory: ./sample
       - local-android/run-smoke-tests2:
           android_simulator: << parameters.android_simulator >>
-      - android/save-gradle-cache:
-          cache-prefix: v1a2
   test_ios:
     parameters:
       ios_simulator:
