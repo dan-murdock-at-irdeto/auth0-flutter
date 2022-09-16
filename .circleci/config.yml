@@ -80,7 +80,7 @@ orbs:
           - android/start-emulator:
               avd-name: auth0_sample_avd
               no-window: true
-              restore-gradle-cache-prefix: v1a
+              restore-gradle-cache-prefix: v1a2
               post-emulator-launch-assemble-command: ""
               post-emulator-wait-steps:
                 - run:
@@ -227,7 +227,7 @@ jobs:
       - local-android/run-smoke-tests2:
           android_simulator: << parameters.android_simulator >>
       - android/save-gradle-cache:
-          cache-prefix: v1a
+          cache-prefix: v1a2
   test_ios:
     parameters:
       ios_simulator:
