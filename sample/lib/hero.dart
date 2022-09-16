@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'constants.dart';
 
 final Shader linearGradient = const LinearGradient(colors: <Color>[
@@ -23,9 +24,20 @@ class HeroWidget extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text('Flutter'),
-                    Text('Sample App'),
+                  children: [
+                    Text('Flutter',
+                        style: GoogleFonts.spaceGrotesk(
+                          foreground: Paint()..shader = linearGradient,
+                          fontSize: 80,
+                          height: 0.8,
+                          fontWeight: FontWeight.w800,
+                        )),
+                    Text('Sample App',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 80,
+                          height: 0.8,
+                          fontWeight: FontWeight.w600,
+                        )),
                   ])))
     ]);
   }
