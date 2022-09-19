@@ -63,6 +63,17 @@ orbs:
                 - run:
                     name: Enable ADB root
                     command: adb root
+          - run:
+              name: Clean gradle
+              command: rm -rf .gradle
+          - run:
+              name: Clean gradle 2
+              command: rm -rf .gradle
+              working-directory: ./auth0_flutter/example
+          - run:
+              name: Clean gradle 3
+              command: rm -rf .gradle
+              working-directory: ./auth0_flutter/example/android
           - android/run-tests:
               max-tries: 1
               working-directory: ./auth0_flutter/example/android
