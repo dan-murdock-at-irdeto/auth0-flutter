@@ -192,6 +192,7 @@ jobs:
       - run:
           name: Run iOS tests
           command: |
+            mkdir -p output
             printf '%s\n%s\n%s' "AUTH0_DOMAIN=$AUTH0_DOMAIN" "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" 'AUTH0_CUSTOM_SCHEME=demo' >> ../.env
             pod install
             SCHEME=Runner
@@ -205,10 +206,6 @@ jobs:
               xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             fi
           working_directory: ./auth0_flutter/example/ios
-      - store_test_results:
-          path: test_output
-      - store_artifacts:
-          path: test_output/results.html
       - run:
           name: Generate iOS test coverage report
           command: |
@@ -225,6 +222,10 @@ jobs:
           upload_name: Auth0 Flutter iOS
           flags: auth0_flutter_ios
           xtra_args: -s ./auth0_flutter/example/ios/cobertura
+      - store_test_results:
+          path: output
+      - store_artifacts:
+          path: output/results.html
 workflows:
   build_and_test:
     jobs:
