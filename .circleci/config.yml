@@ -179,9 +179,7 @@ jobs:
           version: << parameters.ios_version >>
           platform: iOS
           device: << parameters.ios_simulator >>
-      - run:
-          name: Install Rosetta
-          command: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      - macos/install-rosetta
       - flutter/install_sdk_and_pub:
           app-dir: ./auth0_flutter/example
           version: << pipeline.parameters.flutter_version >>
@@ -198,8 +196,8 @@ jobs:
             SCHEME=Runner
             WORKSPACE="$SCHEME".xcworkspace
             SIMULATOR='platform=iOS Simulator,name=<< parameters.ios_simulator >>'
-            HTML_OUTPUT=test_output/results.html
-            JUNIT_OUTPUT=test_output/unit-tests/results.xml
+            HTML_OUTPUT=output/results.html
+            JUNIT_OUTPUT=output/results.xml
             if [ -z "$CIRCLE_PR_NUMBER" ]; then
               xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             else
@@ -221,9 +219,9 @@ jobs:
           flags: auth0_flutter_ios
           xtra_args: -s ./auth0_flutter/example/ios/cobertura
       - store_test_results:
-          path: output
+          path: ./auth0_flutter/example/ios/output
       - store_artifacts:
-          path: output/results.html
+          path: ./auth0_flutter/example/ios/output/results.html
 workflows:
   build_and_test:
     jobs:
