@@ -212,8 +212,6 @@ jobs:
             mkdir cobertura
             bundle exec slather
           working_directory: ./auth0_flutter/example/ios
-      - store_test_results:
-          path: ./auth0_flutter/example/ios/cobertura/cobertura.xml
       - run:
           name: Create ~/.gnupg dir if it does not exist
           command: mkdir -p ~/.gnupg
