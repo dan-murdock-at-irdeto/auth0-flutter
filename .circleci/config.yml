@@ -196,12 +196,13 @@ jobs:
             SCHEME=Runner
             WORKSPACE="$SCHEME".xcworkspace
             SIMULATOR='platform=iOS Simulator,name=<< parameters.ios_simulator >>'
+            RAW_OUTPUT=output/xcodebuild.log
             HTML_OUTPUT=output/results.html
             JUNIT_OUTPUT=output/results.xml
             if [ -z "$CIRCLE_PR_NUMBER" ]; then
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | tee "$RAW_OUTPUT" | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             else
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | tee "$RAW_OUTPUT" | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             fi
           working_directory: ./auth0_flutter/example/ios
       - run:
@@ -220,6 +221,8 @@ jobs:
           xtra_args: -s ./auth0_flutter/example/ios/cobertura
       - store_test_results:
           path: ./auth0_flutter/example/ios/output
+      - store_artifacts:
+          path: ./auth0_flutter/example/ios/output/xcodebuild.log
       - store_artifacts:
           path: ./auth0_flutter/example/ios/output/results.html
 workflows:
