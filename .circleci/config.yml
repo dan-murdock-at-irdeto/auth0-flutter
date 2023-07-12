@@ -197,10 +197,12 @@ jobs:
             SCHEME=Runner
             WORKSPACE="$SCHEME".xcworkspace
             SIMULATOR='platform=iOS Simulator,name=<< parameters.ios_simulator >>'
+            HTML_OUTPUT=test_output/results.html
+            JUNIT_OUTPUT=test_output/unit-tests/results.xml
             if [ -z "$CIRCLE_PR_NUMBER" ]; then
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             else
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | xcpretty --report html --output "$HTML_OUTPUT" --report junit --output "$JUNIT_OUTPUT"
             fi
           working_directory: ./auth0_flutter/example/ios
       - store_test_results:
