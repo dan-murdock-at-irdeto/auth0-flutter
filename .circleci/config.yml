@@ -198,11 +198,15 @@ jobs:
             WORKSPACE="$SCHEME".xcworkspace
             SIMULATOR='platform=iOS Simulator,name=<< parameters.ios_simulator >>'
             if [ -z "$CIRCLE_PR_NUMBER" ]; then
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR"
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" | xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
             else
-              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests
+              xcodebuild test -scheme "$SCHEME" -workspace "$WORKSPACE" -destination "$SIMULATOR" -skip-testing:"$SCHEME"UITests | xcpretty --report html --output test_output/results.html --report junit --output test_output/unit-tests/results.xml
             fi
           working_directory: ./auth0_flutter/example/ios
+      - store_test_results:
+          path: test_output
+      - store_artifacts:
+          path: test_output/results.html
       - run:
           name: Generate iOS test coverage report
           command: |
