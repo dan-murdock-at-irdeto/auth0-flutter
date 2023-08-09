@@ -106,9 +106,9 @@ class WebAuthentication {
   /// Android, or the bundle identifier in iOS. [returnTo] must appear in your
   /// **Allowed Logout URLs** list for the Auth0 app.
   /// [Read more about redirecting users after logout](https://auth0.com/docs/authenticate/login/logout#redirect-users-after-logout).
-  Future<void> logout({final String? returnTo}) async {
+  Future<void> logout({final String? returnTo, final bool? federated}) async {
     await Auth0FlutterWebAuthPlatform.instance.logout(_createWebAuthRequest(
-      WebAuthLogoutOptions(returnTo: returnTo, scheme: _scheme),
+      WebAuthLogoutOptions(returnTo: returnTo, scheme: _scheme, federated: federated),
     ));
     await _credentialsManager?.clearCredentials();
   }
