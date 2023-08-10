@@ -9,7 +9,8 @@ environment:
 
 dependencies:
   auth0_flutter_platform_interface:
-    path: ../auth0_flutter_platform_interface
+
+#    path: ../auth0_flutter_platform_interface
 
   flutter:
     sdk: flutter
