@@ -22,7 +22,7 @@ class LogoutWebAuthRequestHandler(private val builderResolver: (MethodCallReques
             builder.withReturnToUrl(args["returnTo"] as String)
         }
 
-        if (args["federated"]) {
+        if (args["federated"] != null) {
             builder.withFederated();
         }
 
